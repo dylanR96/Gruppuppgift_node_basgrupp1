@@ -32,15 +32,35 @@ const createUser = async (req, res) => {
   }
 };
 
-// Logga in
-const login = (req, res) => {
+// Logga in controller
+const login = async (req, res) => {
+  // Validera användarens input
+  const { error } = userSchema.validate(req.body);
+  // Om valideringen misslyckas
+  if (error) return res.status(400).send(error.details[0].message);
+
+  // Hämta användarnamn och lösenord från request body
   const { username, password } = req.body;
-  findUser(username, (err) => {
-    if (err) return res.status(401).send("Inloggning misslyckades");
-    else {
-      return res.status(200).send(`Inloggning lyckades. Välkommen ${username}`);
-    }
-  });
+
+  try {
+    // Hämtar information om användaren från databasen
+    const user = await db.users.findOne({ username, password });
+
+    // Om användaren inte finns i databasen
+    if (!user)
+      return res.status(401).json({
+        message: `Fel användarnamn eller lösenord.`,
+      });
+
+    // Om användaren finns i databasen.
+    res.status(200).json({
+      message: `Inloggning lyckades. Inloggad användare: ${username}`,
+    });
+  } catch (error) {
+    // Loggar felmeddelandet i konsolen
+    console.error(error);
+    res.status(500).send(`Inloggning misslyckades.`);
+  }
 };
 
 export { createUser, login };
