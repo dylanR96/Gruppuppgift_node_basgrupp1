@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { createUser } from "../controllers/usersController.js";
+
 const router = Router();
 
 // Logga in användare
@@ -12,9 +14,6 @@ router.get("/loginUser/orderHistory", (req, res) => {
 });
 
 // Skapa användare
-router.post("/createUser", (req, res) => {
-  res.status(201).json({ message: "Användare skapad" });
-  //   console.log("Användare skapad");
-});
+router.post("/createUser", createUser);
 
 export default router;
