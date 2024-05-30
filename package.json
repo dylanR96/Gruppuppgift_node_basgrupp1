@@ -1,0 +1,22 @@
+{
+  "name": "gruppuppgift_node_basgrupp1",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Dylan, Eric, Jonathan, Marina, Shahin, Sofia",
+  "main": "server.js",
+  "scripts": {
+    "server": "nodemon --env-file=.env server",
+    "dev": "npm run server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "joi": "^17.13.1",
+    "nedb-promises": "^6.2.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.2"
+  }
+}
