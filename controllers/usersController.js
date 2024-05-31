@@ -2,9 +2,6 @@ import joi from "joi";
 import db from "../db/database.js";
 import bcrypt from "bcrypt";
 
-// Generera en salt till bcrypt
-// const saltRounds = 10;
-
 // Skapa JOI-schema för att validera användarens input
 const userSchema = joi.object({
   username: joi.string().min(3).max(20).required(),
