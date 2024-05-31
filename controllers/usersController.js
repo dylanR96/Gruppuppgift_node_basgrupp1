@@ -1,5 +1,9 @@
 import joi from "joi";
 import db from "../db/database.js";
+import bcrypt from "bcrypt";
+
+// Generera en salt till bcrypt
+// const saltRounds = 10;
 
 // Skapa JOI-schema för att validera användarens input
 const userSchema = joi.object({
@@ -19,7 +23,12 @@ const createUser = async (req, res) => {
     if (existingUser)
       return res.status(400).send("Användarnamnet är redan taget");
 
-    const newUser = { username, password };
+    // Hasha lösenordet
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Skapa en ny användare med hashat lösenord
+    const newUser = { username, password: hashedPassword };
 
     // Spara användaren i databasen
     const createdUser = await db.users.insert(newUser);
@@ -44,13 +53,22 @@ const login = async (req, res) => {
 
   try {
     // Hämtar information om användaren från databasen
-    const user = await db.users.findOne({ username, password });
+    const user = await db.users.findOne({ username });
 
     // Om användaren inte finns i databasen
     if (!user)
       return res.status(401).json({
-        message: `Fel användarnamn eller lösenord.`,
+        message: `Fel användarnamn.`,
       });
+
+    // Jämnför användarens lösenord med det hashade lösenordet i databasen
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if (!validPassword) {
+      return res.status(401).json({
+        message: `Fel lösenord.`,
+      });
+    }
 
     // Om användaren finns i databasen.
     res.status(200).json({
