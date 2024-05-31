@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { deleteItem } from "../controllers/orderController.js";
 
 const router = Router();
 
@@ -17,12 +18,8 @@ router.post("/createOrder", (req, res) => {
   res.sendStatus(201);
 });
 
-// Ta bort order från varukorg
-router.delete("/deleteItem", (req, res) => {
-  res
-    .status(200)
-    .json({ message: "Produkten har tagits bort från kundvagnen" });
-});
+// Ta bort produkt från varukorg
+router.delete("/deleteItem", deleteItem);
 
 // Orderstatus
 router.post("/createOrder/orderStatus", (req, res) => {
