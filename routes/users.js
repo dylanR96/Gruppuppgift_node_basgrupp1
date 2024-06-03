@@ -1,10 +1,10 @@
 import { Router } from "express";
+import { createUser, login } from "../controllers/usersController.js";
+
 const router = Router();
 
 // Logga in användare
-router.get("/loginUser", (req, res) => {
-  //   console.log("Inloggad");
-});
+router.post("/loginUser", login);
 
 // Hämta orderhistorik för inloggad användare
 router.get("/loginUser/orderHistory", (req, res) => {
@@ -12,9 +12,6 @@ router.get("/loginUser/orderHistory", (req, res) => {
 });
 
 // Skapa användare
-router.post("/createUser", (req, res) => {
-  res.status(201).json({ message: "Användare skapad" });
-  //   console.log("Användare skapad");
-});
+router.post("/createUser", createUser);
 
 export default router;
