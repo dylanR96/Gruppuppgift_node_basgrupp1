@@ -8,7 +8,7 @@ const router = Router();
 router.post("/loginUser", login);
 
 // Hämta orderhistorik för inloggad användare
-router.post("/loginUser/orderHistory", authenticate, (req, res) => {
+router.get("/loginUser/orderHistory", authenticate, (req, res) => {
   res.status(200).json({ message: "Orderhistorik" });
   //   console.log("Orderhistorik");
 });
