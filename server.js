@@ -22,6 +22,4 @@ app.use("/api/users", users);
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(port, () =>
-  console.log(`Server is running on PORT ${port}.... This is a test`)
-);
+app.listen(port, () => console.log(`Server is running on PORT: ${port}`));

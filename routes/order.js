@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { createOrder, getOrderStatus } from "../controllers/orderController.js";
+import { createOrder, getOrderStatus, changeOrder } from "../controllers/orderController.js";
+
 
 const router = Router();
 
@@ -9,9 +10,7 @@ router.get("/getOrder", (req, res) => {
 });
 
 // Ändra varukorg
-router.put("/changeOrder", (req, res) => {
-  res.sendStatus(200);
-});
+router.put("/changeOrder", changeOrder);
 
 // Skapa order
 router.post("/createOrder", createOrder);
