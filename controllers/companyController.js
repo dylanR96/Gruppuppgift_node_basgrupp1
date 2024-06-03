@@ -13,7 +13,7 @@ const getMenu = async (req, res) => {
       });
       return res.status(201).json(insertedData);
     } else {
-      return res.status(200).json(result.data);
+      return res.status(200).json(menuData);
     }
   } catch (err) {
     return res.status(500).send({ error: "Error accessing menu" });
@@ -23,7 +23,6 @@ const getMenu = async (req, res) => {
 const getCompanyInfo = async (req, res, next) => {
   try {
     const companyData = await db["company"].findOne({ type: "airbeanInfo" });
-
     if (!companyData) {
       const insertedData = await db["company"].insert({
         type: "airbeanInfo",
@@ -31,7 +30,7 @@ const getCompanyInfo = async (req, res, next) => {
       });
       return res.status(201).json(insertedData);
     } else {
-      return res.status(201).json(insertedData);
+      return res.status(201).json(companyData);
     }
   } catch (err) {
     return res.status(500).send({ error: "Error accessing company info" });

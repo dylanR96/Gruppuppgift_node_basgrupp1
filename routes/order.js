@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { createOrder, changeOrder } from "../controllers/orderController.js";
+import { createOrder, getOrderStatus, changeOrder } from "../controllers/orderController.js";
+
 
 const router = Router();
 
@@ -22,8 +23,6 @@ router.delete("/deleteItem", (req, res) => {
 });
 
 // Orderstatus
-router.post("/createOrder/orderStatus", (req, res) => {
-  res.sendStatus(200);
-});
+router.get("/createOrder/orderStatus/:orderId", getOrderStatus);
 
 export default router;
