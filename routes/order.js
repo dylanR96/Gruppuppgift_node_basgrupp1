@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { createOrder, getOrderStatus } from "../controllers/orderController.js";
 
 const router = Router();
 
@@ -13,9 +14,7 @@ router.put("/changeOrder", (req, res) => {
 });
 
 // Skapa order
-router.post("/createOrder", (req, res) => {
-  res.sendStatus(201);
-});
+router.post("/createOrder", createOrder);
 
 // Ta bort order från varukorg
 router.delete("/deleteItem", (req, res) => {
@@ -25,8 +24,6 @@ router.delete("/deleteItem", (req, res) => {
 });
 
 // Orderstatus
-router.post("/createOrder/orderStatus", (req, res) => {
-  res.sendStatus(200);
-});
+router.get("/createOrder/orderStatus/:orderId", getOrderStatus);
 
 export default router;
