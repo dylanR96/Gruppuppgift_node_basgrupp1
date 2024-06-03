@@ -8,23 +8,22 @@ const createOrder = async (req, res) => {
   const orderId = Math.floor(Math.random() * (999 - 100) + 100);
   let myOrder = orderId.toString();
 
-  const newOrder = req.body;
+  const newOrder = Array.isArray(req.body) ? req.body : [req.body];
 
-  if (Array.isArray(newOrder)) {
-    for (let order of newOrder) {
-      const { id, title, desc, price } = order;
-      if (id == null || title == null || desc == null || price == null) {
-        return res.status(400).json({
-          error: "Each order must contain id, title, desc, and price",
-        });
-      }
+  for (let order of newOrder) {
+    const { id, title, desc, price } = order;
+    if (id == null || title == null || desc == null || price == null) {
+      return res.status(400).json({
+        error: "Each order must contain id, title, desc, and price",
+      });
     }
   }
 
-  newOrder.estDelivery = createDeliveryTime();
-
   try {
-    db["order"].insert({ orderId: myOrder, ...newOrder });
+    newOrder.orderId = orderId;
+    newOrder.estDelivery = createDeliveryTime();
+    await db["order"].insert({ orderId: orderId, newOrder });
+
     return res.status(201).json(`Your order id: ${myOrder}`);
   } catch (error) {
     console.log(error);
