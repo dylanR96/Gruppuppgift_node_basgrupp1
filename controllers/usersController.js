@@ -67,6 +67,9 @@ const login = async (req, res) => {
       });
     }
 
+    // Om användaren finns i databasen och lösenord är korrekt
+    global.currentUser = { id: user._id, username: user.username }; // Minska mängden känslig data
+
     // Om användaren finns i databasen.
     res.status(200).json({
       message: `Inloggning lyckades. Inloggad användare: ${username}`,
@@ -78,4 +81,11 @@ const login = async (req, res) => {
   }
 };
 
-export { createUser, login };
+const logout = (req, res) => {
+  global.currentUser = null;
+  res.status(200).json({
+    message: "Utloggning lyckades.",
+  });
+};
+
+export { createUser, login, logout };
