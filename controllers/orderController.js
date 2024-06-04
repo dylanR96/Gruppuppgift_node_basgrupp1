@@ -1,5 +1,6 @@
 import db from "../db/database.js";
 import menu from "../services/menu.js";
+import createDeliveryTime from "../services/createDeliveryTime.js";
 
 let cart = [];
 
@@ -33,8 +34,6 @@ const deleteItem = async (req, res) => {
   }
 };
 
-import createDeliveryTime from "../services/createDeliveryTime.js";
-
 //Unique order ID (Math random kontrolleras )
 //Order time 15 min - 45 min (Math random)
 
@@ -42,7 +41,7 @@ const createOrder = async (req, res) => {
   //Creates unique id for order
   const orderId = Math.floor(Math.random() * (999 - 100) + 100);
   //Makes order id into a string
-  let myOrderId = orderId.toString();
+  const myOrderId = orderId.toString();
 
   //Checks if data is an array or just an object
   const newOrder = Array.isArray(req.body) ? req.body : [req.body];
@@ -55,16 +54,36 @@ const createOrder = async (req, res) => {
         error: "Each order must contain id, title, desc, and price",
       });
     }
+
+    let itemFound = false;
+    for (let item of menu) {
+      if (
+        item._id === order.id &&
+        item.title === order.title &&
+        item.desc === order.desc &&
+        item.price === order.price
+      ) {
+        itemFound = true;
+        break;
+      }
+    }
+
+    if (!itemFound) {
+      return res.status(400).json({
+        error: "Items must match menu",
+      });
+    }
   }
 
   try {
-    //Adds order to object
-    newOrder.orderId = orderId;
     //Adds estimated delivery to object
-    newOrder.estDelivery = createDeliveryTime();
 
     //Inserts created data into database
-    await db["order"].insert({ orderId: orderId, newOrder });
+    await db["order"].insert({
+      orderId: myOrderId,
+      estDelivery: createDeliveryTime(),
+      newOrder,
+    });
     //Returns order id for created order
     return res.status(201).json(`Your order id: ${myOrderId}`);
   } catch (error) {
@@ -72,7 +91,6 @@ const createOrder = async (req, res) => {
     return res.status(500).send({ error: "Error adding new order" });
   }
 };
-
 
 // För att lägga till en produkt i ordern
 const changeOrder = async (req, res) => {
@@ -109,7 +127,6 @@ const changeOrder = async (req, res) => {
 const getOrderStatus = async (req, res) => {
   //Receives order id as parameter from user
   const { orderId } = req.params;
-
   //Looks for order id in database
   try {
     const orderData = await db["order"].findOne({ orderId: orderId });
@@ -127,4 +144,3 @@ const getOrderStatus = async (req, res) => {
 };
 
 export { createOrder, getOrderStatus, changeOrder, deleteItem };
-
