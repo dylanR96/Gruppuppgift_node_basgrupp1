@@ -143,4 +143,8 @@ const getOrderStatus = async (req, res) => {
   }
 };
 
-export { createOrder, getOrderStatus, changeOrder, deleteItem };
+const completeOrder = async (req, res) => {
+  console.log("Look at me mom I am complete!");
+};
+
+export { createOrder, getOrderStatus, changeOrder, deleteItem, completeOrder };

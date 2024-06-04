@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { createOrder, getOrderStatus, changeOrder, deleteItem } from "../controllers/orderController.js";
+import {
+  createOrder,
+  getOrderStatus,
+  changeOrder,
+  deleteItem,
+  completeOrder,
+} from "../controllers/orderController.js";
 
 const router = Router();
 
@@ -19,5 +25,7 @@ router.delete("/deleteItem", deleteItem);
 
 // Orderstatus
 router.get("/createOrder/orderStatus/:orderId", getOrderStatus);
+
+router.post("/completeOrder/:orderId", completeOrder);
 
 export default router;
