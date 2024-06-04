@@ -5,6 +5,7 @@ import {
   changeOrder,
   deleteItem,
   completeOrder,
+  orderHistory,
   getOrder,
 } from "../controllers/orderController.js";
 
@@ -19,12 +20,15 @@ router.put("/changeOrder", changeOrder);
 // Skapa order
 router.post("/createOrder", createOrder);
 
-// Ta bort produkt från varukorg
+// Töm varukorg
 router.delete("/deleteItem", deleteItem);
 
 // Orderstatus
 router.get("/createOrder/orderStatus/:orderId", getOrderStatus);
 
 router.post("/completeOrder/:orderId", completeOrder);
+
+// Orderhistorik
+router.get("/orderHistory/:userId", orderHistory);
 
 export default router;

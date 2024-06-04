@@ -81,6 +81,7 @@ const login = async (req, res) => {
   }
 };
 
+// Logga ut användare
 const logout = (req, res) => {
   global.currentUser = null;
   res.status(200).json({
