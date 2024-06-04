@@ -5,14 +5,13 @@ import {
   changeOrder,
   deleteItem,
   completeOrder,
+  getOrder,
 } from "../controllers/orderController.js";
 
 const router = Router();
 
 // Hämta varukorg
-router.get("/getOrder", (req, res) => {
-  res.send("<h1>Visa varukorg</h1>");
-});
+router.get("/getOrder/:orderId", getOrder);
 
 // Ändra varukorg
 router.put("/changeOrder", changeOrder);
