@@ -92,6 +92,25 @@ const createOrder = async (req, res) => {
   }
 };
 
+const getOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await db["order"].findOne({ orderId: orderId });
+    //Error if there is no order with certain id.
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const { estDelivery, ...removeEstDelivery } = order;
+    // If no error then respond status 200.
+    return res.status(200).json(removeEstDelivery);
+  } catch (error) {
+    console.log("Error retrieving orders:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // För att lägga till en produkt i ordern
 const changeOrder = async (req, res) => {
   // För felhantering
@@ -147,4 +166,11 @@ const completeOrder = async (req, res) => {
   console.log("Look at me mom I am complete!");
 };
 
-export { createOrder, getOrderStatus, changeOrder, deleteItem, completeOrder };
+export {
+  createOrder,
+  getOrderStatus,
+  changeOrder,
+  deleteItem,
+  completeOrder,
+  getOrder,
+};
