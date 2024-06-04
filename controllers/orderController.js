@@ -77,12 +77,26 @@ const createOrder = async (req, res) => {
 
   try {
     //Adds estimated delivery to object
+    console.log("Request query:", req.query);
+    const userId = req.query.userId;
+    if (!userId) {
+      console.log("User ID not provided");
+    } else {
+      // Kolla om användarID finns i databasen
+      const userExists = await db["users"].findOne({ _id: userId });
 
+      if (!userExists) {
+        console.log("User ID does not exist in database");
+      } else {
+        console.log("User ID exists in database");
+      }
+    }
     //Inserts created data into database
     await db["order"].insert({
       orderId: myOrderId,
       estDelivery: createDeliveryTime(),
       newOrder,
+      userId: userId,
     });
     //Returns order id for created order
     return res.status(201).json(`Your order id: ${myOrderId}`);
@@ -161,4 +175,28 @@ const completeOrder = async (req, res) => {
   }
 };
 
-export { createOrder, getOrderStatus, changeOrder, deleteItem, completeOrder };
+const orderHistory = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const userOrders = await db.completeOrder.find({ userId: userId });
+    if (!userOrders) {
+      return res
+        .status(404)
+        .send({ error: "Order history not found for this user" });
+    }
+    return res.status(200).json({
+      orderHistory: userOrders,
+    });
+  } catch (error) {
+    return res.status(500).send({ error: "Error finding order history" });
+  }
+};
+
+export {
+  createOrder,
+  getOrderStatus,
+  changeOrder,
+  deleteItem,
+  completeOrder,
+  orderHistory,
+};
