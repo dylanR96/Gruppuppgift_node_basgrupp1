@@ -129,7 +129,7 @@ const getOrderStatus = async (req, res) => {
   const { orderId } = req.params;
   //Looks for order id in database
   try {
-    const orderData = await db["order"].findOne({ orderId: orderId });
+    const orderData = await db["completeOrder"].findOne({ orderId: orderId });
     //Error handling for order id
     if (!orderData) {
       return res.status(404).send({ error: "Order not found" });
@@ -144,7 +144,21 @@ const getOrderStatus = async (req, res) => {
 };
 
 const completeOrder = async (req, res) => {
-  console.log("Look at me mom I am complete!");
+  const { orderId } = req.params;
+
+  try {
+    const orderData = await db.order.findOne({ orderId: orderId });
+    if (!orderData) {
+      return res.status(404).send({ error: "Order not found" });
+    }
+    const updateData = await db.completeOrder.insert(orderData);
+    const deletedData = await db.order.remove(orderData, { multi: true });
+    return res.status(200).json({
+      message: `Your order is complete. Order id: ${orderId}`,
+    });
+  } catch (error) {
+    return res.status(500).send({ error: "Error finding order id" });
+  }
 };
 
 export { createOrder, getOrderStatus, changeOrder, deleteItem, completeOrder };
