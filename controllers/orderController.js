@@ -51,12 +51,14 @@ const deleteItem = async (req, res) => {
     // Returns the removed item and a message. If an error occurs, a status 500 will be returned instead
     return res
       .status(200)
-      .json({ removedData, message: "The product is removed." });
+      .json({ removedData, message: "The product is removed" });
+
   } catch (error) {
     console.error(
       "An error occurred while trying to remove the product:",
       error
     );
+
     return res.status(500).json({ message: "Internal server error." });
   }
 };
@@ -116,7 +118,9 @@ const createOrder = async (req, res) => {
         console.log("User ID exists in database.");
       }
     }
-    // Inserts created data into database
+
+    //Inserts created data into database
+
     await db["order"].insert({
       orderId: myOrderId,
       estDelivery: createDeliveryTime(),
@@ -151,31 +155,57 @@ const getOrder = async (req, res) => {
   }
 };
 
-// Add a product to your order
+// To add a product to the order
 const changeOrder = async (req, res) => {
-  // Get data from body
-  const { id, title, desc, price } = req.body;
+  const { orderId } = req.params;
+  const updatedItems = Array.isArray(req.body) ? req.body : [req.body];
 
-  // Creates a loop to loop through each "order"/"product" in the body
-  for (let order of req.body) {
-    // If any of these properties are missing, return an error
+  for (let order of updatedItems) {
     const { id, title, desc, price } = order;
+    if (!id || !title || !desc || !price) {
+      return res.status(400).json({
+        error: "Each order must contain id, title, desc and price",
+      });
+    }
+    let itemFound = false;
 
-    if (id == null || title == null || desc == null || price == null) {
-      return res
-        .status(400)
-        .json({ error: "Each order must contain id, title, desc, and price." });
+    for (let item of menu) {
+      if (
+        item._id === id &&
+        item.title === title &&
+        item.desc === desc &&
+        item.price === price
+      ) {
+        itemFound = true;
+        break;
+      }
+    }
+
+    if (!itemFound) {
+      return res.status(400).json({
+        error: "Items must match menu",
+      });
     }
   }
 
   try {
-    // Get data from database and added to updateData variable
-    const updateData = await db.order.insert(req.body);
+    const existingOrder = await db["order"].findOne({ orderId });
+    if (!existingOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    existingOrder.newOrder = [existingOrder.newOrder, ...updatedItems];
 
-    // Returns a status 200 and en status 200 och sends updateData
-    return res.status(200).json(updateData);
+    await db["order"].update(
+      { orderId },
+      { $set: { newOrder: existingOrder.newOrder } }
+    );
+    return res
+      .status(200)
+      .json({ message: "Order has been updated successfully", orderId });
   } catch (error) {
-    return res.status(500).send({ error: "Error updating order." });
+    console.error("Error updating order");
+   
+    return res.status(500).send({ error: "Error updating order" });
   }
 };
 

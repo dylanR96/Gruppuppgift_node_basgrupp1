@@ -16,7 +16,7 @@ const router = Router();
 router.get("/getOrder/:orderId", getOrder);
 
 // Change order
-router.put("/changeOrder", changeOrder);
+router.put("/changeOrder/:orderId", changeOrder);
 
 // Create order
 router.post("/createOrder", createOrder);
