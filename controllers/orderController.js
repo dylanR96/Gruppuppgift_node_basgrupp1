@@ -33,9 +33,6 @@ const deleteItem = async (req, res) => {
   }
 };
 
-//Unique order ID (Math random kontrolleras )
-//Order time 15 min - 45 min (Math random)
-
 const createOrder = async (req, res) => {
   //Creates unique id for order
   const orderId = Math.floor(Math.random() * (999 - 100) + 100);
