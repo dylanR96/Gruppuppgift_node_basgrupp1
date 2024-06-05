@@ -194,9 +194,9 @@ const completeOrder = async (req, res) => {
   }
 };
 
-
 const orderHistory = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.query.userId;
+
   try {
     const userOrders = await db.completeOrder.find({ userId: userId });
     if (!userOrders) {
@@ -220,5 +220,4 @@ export {
   completeOrder,
   orderHistory,
   getOrder,
-
 };

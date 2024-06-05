@@ -8,6 +8,7 @@ import {
   orderHistory,
   getOrder,
 } from "../controllers/orderController.js";
+import authenticate from "../middleware/auth.js";
 
 const router = Router();
 
@@ -26,9 +27,10 @@ router.delete("/deleteItem", deleteItem);
 // Orderstatus
 router.get("/createOrder/orderStatus/:orderId", getOrderStatus);
 
+// Slutföra order
 router.post("/completeOrder/:orderId", completeOrder);
 
 // Orderhistorik
-router.get("/orderHistory/:userId", orderHistory);
+router.get("/orderHistory/:userId", authenticate, orderHistory);
 
 export default router;

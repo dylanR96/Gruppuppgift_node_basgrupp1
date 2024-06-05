@@ -72,7 +72,7 @@ const login = async (req, res) => {
 
     // Om användaren finns i databasen.
     res.status(200).json({
-      message: `Inloggning lyckades. Inloggad användare: ${username}`,
+      message: `Inloggning lyckades. Inloggad användare: ${username}. Användarid: ${user._id}`,
     });
   } catch (error) {
     // Loggar felmeddelandet i konsolen
