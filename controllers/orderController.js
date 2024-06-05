@@ -2,11 +2,15 @@ import db from "../db/database.js";
 import menu from "../services/menu.js";
 import createDeliveryTime from "../services/createDeliveryTime.js";
 
-let cart = [];
-
+// To delete a product from the order
 const deleteItem = async (req, res) => {
+  const orderId = req.params.orderId;
+  const itemId = parseInt(req.query.itemId, 10);
+
   try {
-    const { productId } = req.body;
+    // Finds the order in the database
+    const orderData = await db["order"].findOne({ orderId });
+
 
     // Check that productId is available
     if (!productId) {
@@ -24,12 +28,53 @@ const deleteItem = async (req, res) => {
     // Remove the specific product from the basket
     cart.splice(productIndex, 1);
 
-    res
+    // If order is not found in database
+    if (!orderData) {
+      return res.status(404).json({
+        order: orderId,
+        error: "Order not found, please enter a valid order id",
+      });
+    }
+
+    // Finds the item in the order
+    const itemIndex = orderData.newOrder.findIndex(
+      (item) => item.id === itemId
+    );
+
+    // If the product cant be found in the order
+    if (itemIndex === -1) {
+      return res.status(404).json({
+        itemId,
+        error: "Product not found, please enter a valid product id",
+      });
+    }
+
+    //  Removes the item from the order
+    const removedData = orderData.newOrder.splice(itemIndex, 1)[0];
+
+    // Creates a new order with the removed item but with the same order id
+    await db["order"].update(
+      { orderId: orderId },
+      { $set: { newOrder: orderData.newOrder } }
+    );
+
+    // If every item gets removed from the order, the order will be deleted
+    if (orderData.newOrder.length === 0) {
+      await db["order"].remove({
+        orderId,
+      });
+    }
+
+    // Returns the removed item and a message. If an error occurs, a status 500 will be returned instead
+    return res
       .status(200)
-      .json({ message: "Produkten har tagits bort från kundvagnen" });
+      .json({ removedData, message: "The product is removed" });
   } catch (error) {
-    console.error("Fel vid bortttagning av produkt:", error);
-    return res.status(500).json({ message: "Internt serverfel" });
+    console.error(
+      "An error occurred while trying to remove the product:",
+      error
+    );
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -72,11 +117,13 @@ const createOrder = async (req, res) => {
   }
 
   try {
+
     //Inserts created data into database
     await db["order"].insert({
       orderId: myOrderId,
       estDelivery: createDeliveryTime(),
       newOrder,
+      userId: userId,
     });
     //Returns order id for created order
     return res.status(201).json(`Your order id: ${myOrderId}`);
@@ -105,12 +152,14 @@ const getOrder = async (req, res) => {
   }
 };
 
+
 // To add a product to the order
 const changeOrder = async (req, res) => {
   const { orderId } = req.params;
   const updatedItems = Array.isArray(req.body) ? req.body : [req.body];
 
   for (let order of updatedItems) {
+
     const { id, title, desc, price } = order;
     if (!id || !title || !desc || !price) {
       return res.status(400).json({
@@ -154,6 +203,7 @@ const changeOrder = async (req, res) => {
       .json({ message: "Order has been updated successfully", orderId });
   } catch (error) {
     console.error("Error updating order");
+   
     return res.status(500).send({ error: "Error updating order" });
   }
 };
@@ -195,11 +245,29 @@ const completeOrder = async (req, res) => {
   }
 };
 
+const orderHistory = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const userOrders = await db.completeOrder.find({ userId: userId });
+    if (!userOrders) {
+      return res
+        .status(404)
+        .send({ error: "Order history not found for this user" });
+    }
+    return res.status(200).json({
+      orderHistory: userOrders,
+    });
+  } catch (error) {
+    return res.status(500).send({ error: "Error finding order history" });
+  }
+};
+
 export {
   createOrder,
   getOrderStatus,
   changeOrder,
   deleteItem,
   completeOrder,
+  orderHistory,
   getOrder,
 };
