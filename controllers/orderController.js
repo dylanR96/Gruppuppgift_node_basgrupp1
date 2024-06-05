@@ -52,7 +52,6 @@ const deleteItem = async (req, res) => {
     return res
       .status(200)
       .json({ removedData, message: "The product is removed" });
-
   } catch (error) {
     console.error(
       "An error occurred while trying to remove the product:",
@@ -113,9 +112,7 @@ const createOrder = async (req, res) => {
       const userExists = await db["users"].findOne({ _id: userId });
 
       if (!userExists) {
-        console.log("User ID does not exist in database.");
-      } else {
-        console.log("User ID exists in database.");
+        return res.status(400).send("Incorrect user id");
       }
     }
 
@@ -204,7 +201,7 @@ const changeOrder = async (req, res) => {
       .json({ message: "Order has been updated successfully", orderId });
   } catch (error) {
     console.error("Error updating order");
-   
+
     return res.status(500).send({ error: "Error updating order" });
   }
 };
@@ -249,10 +246,11 @@ const completeOrder = async (req, res) => {
 
 // Retrieves order history for a specific user
 const orderHistory = async (req, res) => {
-  const userId = req.query.userId;
+  const userId = req.params.userId;
 
   try {
     const userOrders = await db.completeOrder.find({ userId: userId });
+    console.log(userOrders);
     if (!userOrders) {
       return res
         .status(404)

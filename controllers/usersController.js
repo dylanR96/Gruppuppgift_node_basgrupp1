@@ -55,7 +55,7 @@ const login = async (req, res) => {
     // Checks if user doesn't exist in database
     if (!user)
       return res.status(401).json({
-        message: `Incorrect username.`,
+        message: `Incorrect username or password.`,
       });
 
     // Compares password with hashed password in database
@@ -63,7 +63,7 @@ const login = async (req, res) => {
 
     if (!validPassword) {
       return res.status(401).json({
-        message: `Incorrect password.`,
+        message: `Incorrect username or password.`,
       });
     }
 
