@@ -246,11 +246,10 @@ const completeOrder = async (req, res) => {
 
 // Retrieves order history for a specific user
 const orderHistory = async (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.query.userId;
 
   try {
     const userOrders = await db.completeOrder.find({ userId: userId });
-    console.log(userOrders);
     if (!userOrders) {
       return res
         .status(404)
