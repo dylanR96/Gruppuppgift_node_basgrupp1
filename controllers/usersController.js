@@ -2,12 +2,13 @@ import joi from "joi";
 import db from "../db/database.js";
 import bcrypt from "bcrypt";
 
-// Skapa JOI-schema för att validera användarens input
+// Creates a JOI schema to validate user input
 const userSchema = joi.object({
-  username: joi.string().min(3).max(20).required(),
+  username: joi.string().min(3).max(20).alphanum().required(),
   password: joi.string().min(3).max(20).required(),
 });
 
+// Creates a new user with input validation and errorhandling
 const createUser = async (req, res) => {
   const { error } = userSchema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -15,77 +16,76 @@ const createUser = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Kontrollera om användarnamnet redan finns
+    // Checks if the username already exists
     const existingUser = await db.users.findOne({ username });
-    if (existingUser)
-      return res.status(400).send("Användarnamnet är redan taget");
+    if (existingUser) return res.status(400).send("Username already exists.");
 
-    // Hasha lösenordet
+    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Skapa en ny användare med hashat lösenord
+    // Creates a new user with hashed password
     const newUser = { username, password: hashedPassword };
 
-    // Spara användaren i databasen
+    // Saves new user
     const createdUser = await db.users.insert(newUser);
     res.status(201).json({
-      message: "Användare skapad",
+      message: "User created.",
       user: { id: createdUser._id, username: createdUser.username },
     });
   } catch (err) {
-    res.status(500).send("Kunde inte skapa användaren.");
+    res.status(500).send("Could not create user.");
   }
 };
 
-// Logga in controller
+// Login controller
 const login = async (req, res) => {
-  // Validera användarens input
+  // Validates users input
   const { error } = userSchema.validate(req.body);
-  // Om valideringen misslyckas
+  // Checks if validation fails
   if (error) return res.status(400).send(error.details[0].message);
 
-  // Hämta användarnamn och lösenord från request body
+  // Get username and password from request body
   const { username, password } = req.body;
 
   try {
-    // Hämtar information om användaren från databasen
+    // Get information about user from database
     const user = await db.users.findOne({ username });
 
-    // Om användaren inte finns i databasen
+    // Checks if user doesn't exist in database
     if (!user)
       return res.status(401).json({
-        message: `Fel användarnamn.`,
+        message: `Incorrect username.`,
       });
 
-    // Jämnför användarens lösenord med det hashade lösenordet i databasen
+    // Compares password with hashed password in database
     const validPassword = await bcrypt.compare(password, user.password);
 
     if (!validPassword) {
       return res.status(401).json({
-        message: `Fel lösenord.`,
+        message: `Incorrect password.`,
       });
     }
 
-    // Om användaren finns i databasen och lösenord är korrekt
-    global.currentUser = { id: user._id, username: user.username }; // Minska mängden känslig data
+    // Checks if user exists in database and password is correct
+    global.currentUser = { id: user._id, username: user.username };
 
-    // Om användaren finns i databasen.
+    // Checks if user already exists in database
     res.status(200).json({
-      message: `Inloggning lyckades. Inloggad användare: ${username}`,
+      message: `Login successful. Logged in user: ${username}. Id: ${user._id}.`,
     });
   } catch (error) {
-    // Loggar felmeddelandet i konsolen
+    // Logging error message in console
     console.error(error);
-    res.status(500).send(`Inloggning misslyckades.`);
+    res.status(500).send(`Login failed.`);
   }
 };
 
-// Logga ut användare
+// Logout user
 const logout = (req, res) => {
   global.currentUser = null;
   res.status(200).json({
-    message: "Utloggning lyckades.",
+    message: "Logout successful.",
   });
 };
 

@@ -14,13 +14,16 @@ const app = express();
 
 global.currentUser = null;
 
+// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Routes
 app.use("/api/company", company);
 app.use("/api/order", order);
 app.use("/api/users", users);
 
+// Middlewares
 app.use(notFound);
 app.use(errorHandler);
 

@@ -8,27 +8,29 @@ import {
   orderHistory,
   getOrder,
 } from "../controllers/orderController.js";
+import authenticate from "../middleware/auth.js";
 
 const router = Router();
 
-// Hämta varukorg
+// Get cart
 router.get("/getOrder/:orderId", getOrder);
 
-// Ändra varukorg
+// Change order
 router.put("/changeOrder/:orderId", changeOrder);
 
-// Skapa order
+// Create order
 router.post("/createOrder", createOrder);
 
-// Ta bort item från varukorg
-router.delete("/deleteItem", deleteItem);
+// Remove item from cart
+router.delete("/deleteItem/:orderId", deleteItem);
 
 // Orderstatus
 router.get("/createOrder/orderStatus/:orderId", getOrderStatus);
 
+// Complete order
 router.post("/completeOrder/:orderId", completeOrder);
 
-// Orderhistorik
-router.get("/orderHistory/:userId", orderHistory);
+// Order history and authentication
+router.get("/orderHistory/:userId", authenticate, orderHistory);
 
 export default router;

@@ -3,10 +3,10 @@ import { getMenu, getCompanyInfo } from "../controllers/companyController.js";
 
 const router = Router();
 
-// Hämta menyn
+// Get menu
 router.get("/menu", getMenu);
 
-// Hämta information om företaget
+// Get information about the company
 router.get("/companyInfo", getCompanyInfo);
 
 export default router;

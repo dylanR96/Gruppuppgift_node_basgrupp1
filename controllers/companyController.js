@@ -2,6 +2,7 @@ import db from "../db/database.js";
 import menu from "../services/menu.js";
 import airbeanInfo from "../services/companyInfo.js";
 
+// Get menu
 const getMenu = async (req, res) => {
   try {
     const menuData = await db["company"].findOne({ type: "menu" });
@@ -20,10 +21,13 @@ const getMenu = async (req, res) => {
   }
 };
 
+// Get information about the company
 const getCompanyInfo = async (req, res, next) => {
   try {
+    // Retrieves data from database
     const companyData = await db["company"].findOne({ type: "airbeanInfo" });
     if (!companyData) {
+      // Inserts data into database
       const insertedData = await db["company"].insert({
         type: "airbeanInfo",
         data: airbeanInfo,
