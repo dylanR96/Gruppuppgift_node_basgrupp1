@@ -1,3 +1,5 @@
+// Middleware for 404 errors
+
 const notFound = (req, res, next) => {
   const error = new Error("Not found");
   error.status = 404;
