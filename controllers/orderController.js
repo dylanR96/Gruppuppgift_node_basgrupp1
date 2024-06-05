@@ -11,6 +11,23 @@ const deleteItem = async (req, res) => {
     // Finds the order in the database
     const orderData = await db["order"].findOne({ orderId });
 
+
+    // Check that productId is available
+    if (!productId) {
+      return res.status(400).json({ message: "Produkt-ID saknas" });
+    }
+
+    // Find the index of the product in the cart based on the productId
+    const productIndex = cart.findIndex((product) => product.id === productId);
+    if (productIndex === -1) {
+      return res
+        .status(404)
+        .json({ message: "Produkten finns inte i kundvagnen" });
+    }
+
+    // Remove the specific product from the basket
+    cart.splice(productIndex, 1);
+
     // If order is not found in database
     if (!orderData) {
       return res.status(404).json({
@@ -61,9 +78,6 @@ const deleteItem = async (req, res) => {
   }
 };
 
-//Unique order ID (Math random kontrolleras )
-//Order time 15 min - 45 min (Math random)
-
 const createOrder = async (req, res) => {
   //Creates unique id for order
   const orderId = Math.floor(Math.random() * (999 - 100) + 100);
@@ -103,21 +117,7 @@ const createOrder = async (req, res) => {
   }
 
   try {
-    //Adds estimated delivery to object
-    console.log("Request query:", req.query);
-    const userId = req.query.userId;
-    if (!userId) {
-      console.log("User ID not provided");
-    } else {
-      // Kolla om användarID finns i databasen
-      const userExists = await db["users"].findOne({ _id: userId });
 
-      if (!userExists) {
-        console.log("User ID does not exist in database");
-      } else {
-        console.log("User ID exists in database");
-      }
-    }
     //Inserts created data into database
     await db["order"].insert({
       orderId: myOrderId,
@@ -152,37 +152,58 @@ const getOrder = async (req, res) => {
   }
 };
 
-// Add products to the order
+
+// To add a product to the order
 const changeOrder = async (req, res) => {
-  //Checks if data is an array or just an object
-  // const newOrder = Array.isArray(req.body) ? req.body : [req.body];
+  const { orderId } = req.params;
+  const updatedItems = Array.isArray(req.body) ? req.body : [req.body];
 
-  // To retrieve data from the body.
-  const { id, title, desc, price } = req.body;
+  for (let order of updatedItems) {
 
-  // Create a loop that loops through each "order"/"product" in the body
-  for (let order of req.body) {
     const { id, title, desc, price } = order;
+    if (!id || !title || !desc || !price) {
+      return res.status(400).json({
+        error: "Each order must contain a Id, title, desc and price",
+      });
+    }
+    let itemFound = false;
 
-    // If something is missing in the body, return a status 400 and an error message
-    if (id == null || title == null || desc == null || price == null) {
-      return res
-        .status(400)
-        .json({ error: "Each order must contain id, title, desc, and price" });
+    for (let item of menu) {
+      if (
+        item._id === id &&
+        item.title === title &&
+        item.desc === desc &&
+        item.price === price
+      ) {
+        itemFound = true;
+        break;
+      }
+    }
+
+    if (!itemFound) {
+      return res.status(400).json({
+        error: "Items must match menu",
+      });
     }
   }
 
-  // If everything that is needed in the body, The following code will run
   try {
-    // Insert the data into the database.
-    const updateData = await db.order.insert(req.body);
+    const existingOrder = await db["order"].findOne({ orderId });
+    if (!existingOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    existingOrder.newOrder = [existingOrder.newOrder, ...updatedItems];
 
-    // Returns a status 200 and the data that was inserted
-    return res.status(200).json(updateData);
-
-    // If there is an error, the following code will run
+    await db["order"].update(
+      { orderId },
+      { $set: { newOrder: existingOrder.newOrder } }
+    );
+    return res
+      .status(200)
+      .json({ message: "Order has been updated successfully", orderId });
   } catch (error) {
-    // Returns a status 500 and an error message
+    console.error("Error updating order");
+   
     return res.status(500).send({ error: "Error updating order" });
   }
 };
