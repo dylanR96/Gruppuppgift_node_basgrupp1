@@ -2,35 +2,62 @@ import db from "../db/database.js";
 import menu from "../services/menu.js";
 import createDeliveryTime from "../services/createDeliveryTime.js";
 
-let cart = [];
-
-// vi får eventuellt byta ut productId senare beroende vad id:t från ordern heter
+// To delete a product from the order
 const deleteItem = async (req, res) => {
+  const orderId = req.params.orderId;
+  const itemId = parseInt(req.query.itemId, 10);
+
   try {
-    const { productId } = req.body;
+    // Finds the order in the database
+    const orderData = await db["order"].findOne({ orderId });
 
-    // Kontrollera att productId är tillgängligt
-    if (!productId) {
-      return res.status(400).json({ message: "Produkt-ID saknas" });
+    // If order is not found in database
+    if (!orderData) {
+      return res.status(404).json({
+        order: orderId,
+        error: "Order not found, please enter a valid order id",
+      });
     }
 
-    // Hitta indexet för produkten i korgen baserat på productId
-    const productIndex = cart.findIndex((product) => product.id === productId);
-    if (productIndex === -1) {
-      return res
-        .status(404)
-        .json({ message: "Produkten finns inte i kundvagnen" });
+    // Finds the item in the order
+    const itemIndex = orderData.newOrder.findIndex(
+      (item) => item.id === itemId
+    );
+
+    // If the product cant be found in the order
+    if (itemIndex === -1) {
+      return res.status(404).json({
+        itemId,
+        error: "Product not found, please enter a valid product id",
+      });
     }
 
-    // Ta bort den specifika produkten från korgen
-    cart.splice(productIndex, 1);
+    //  Removes the item from the order
+    const removedData = orderData.newOrder.splice(itemIndex, 1)[0];
 
-    res
+    // Creates a new order with the removed item but with the same order id
+    await db["order"].update(
+      { orderId: orderId },
+      { $set: { newOrder: orderData.newOrder } }
+    );
+
+    // If every item gets removed from the order, the order will be deleted
+    if (orderData.newOrder.length === 0) {
+      await db["order"].remove({
+        orderId,
+      });
+    }
+
+    // Returns the removed item and a message. If an error occurs, a status 500 will be returned instead
+    return res
       .status(200)
-      .json({ message: "Produkten har tagits bort från kundvagnen" });
+      .json({ removedData, message: "The product is removed" });
   } catch (error) {
-    console.error("Fel vid bortttagning av produkt:", error);
-    return res.status(500).json({ message: "Internt serverfel" });
+    console.error(
+      "An error occurred while trying to remove the product:",
+      error
+    );
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -92,19 +119,19 @@ const createOrder = async (req, res) => {
   }
 };
 
-// För att lägga till en produkt i ordern
+// To add a product to the order
 const changeOrder = async (req, res) => {
-  // För felhantering
-  // console.log(`id: ${id}, title: ${title}, desc: ${desc}, price: ${price}`);
+  //Checks if data is an array or just an object
+  // const newOrder = Array.isArray(req.body) ? req.body : [req.body];
 
-  // För att hämta data ifrån bodyn.
+  // To retrieve data from the body.
   const { id, title, desc, price } = req.body;
 
-  // Skapa en loop som loopar igenom varje "order"/"produkt" i bodyn
+  // Create a loop that loops through each "order"/"product" in the body
   for (let order of req.body) {
-    // Om någon av dessa saknas i bodyn så returneras ett felmeddelande.
     const { id, title, desc, price } = order;
 
+    // If something is missing in the body, return a status 400 and an error message
     if (id == null || title == null || desc == null || price == null) {
       return res
         .status(400)
@@ -112,14 +139,17 @@ const changeOrder = async (req, res) => {
     }
   }
 
-  // Om allt finns i bodyn så körs koden nedanför.
+  // If everything that is needed in the body, The following code will run
   try {
-    // Hämtar data ifrån databasen och lägger in i variabeln updateData.
+    // Insert the data into the database.
     const updateData = await db.order.insert(req.body);
 
-    // Returnerar en status 200 och skickar med updateData.
+    // Returns a status 200 and the data that was inserted
     return res.status(200).json(updateData);
+
+    // If there is an error, the following code will run
   } catch (error) {
+    // Returns a status 500 and an error message
     return res.status(500).send({ error: "Error updating order" });
   }
 };
