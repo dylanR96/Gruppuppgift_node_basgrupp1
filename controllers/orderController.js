@@ -4,17 +4,16 @@ import createDeliveryTime from "../services/createDeliveryTime.js";
 
 let cart = [];
 
-// vi får eventuellt byta ut productId senare beroende vad id:t från ordern heter
 const deleteItem = async (req, res) => {
   try {
     const { productId } = req.body;
 
-    // Kontrollera att productId är tillgängligt
+    // Check that productId is available
     if (!productId) {
       return res.status(400).json({ message: "Produkt-ID saknas" });
     }
 
-    // Hitta indexet för produkten i korgen baserat på productId
+    // Find the index of the product in the cart based on the productId
     const productIndex = cart.findIndex((product) => product.id === productId);
     if (productIndex === -1) {
       return res
@@ -22,7 +21,7 @@ const deleteItem = async (req, res) => {
         .json({ message: "Produkten finns inte i kundvagnen" });
     }
 
-    // Ta bort den specifika produkten från korgen
+    // Remove the specific product from the basket
     cart.splice(productIndex, 1);
 
     res
@@ -76,8 +75,6 @@ const createOrder = async (req, res) => {
   }
 
   try {
-    //Adds estimated delivery to object
-
     //Inserts created data into database
     await db["order"].insert({
       orderId: myOrderId,
@@ -111,7 +108,7 @@ const getOrder = async (req, res) => {
   }
 };
 
-// För att lägga till en produkt i ordern
+// To add a product to the order
 const changeOrder = async (req, res) => {
   const { orderId } = req.params;
   const updatedItems = Array.isArray(req.body) ? req.body : [req.body];
