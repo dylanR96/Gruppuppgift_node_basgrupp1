@@ -25,7 +25,7 @@ router.post("/createOrder", createOrder);
 router.delete("/deleteItem/:orderId", deleteItem);
 
 // Orderstatus
-router.get("/createOrder/orderStatus/:orderId", getOrderStatus);
+router.get("/orderStatus/:orderId", getOrderStatus);
 
 // Complete order
 router.post("/completeOrder/:orderId", completeOrder);

@@ -1,8 +1,4 @@
 import express from "express";
-import path from "path";
-import cors from "cors";
-import { fileURLToPath } from "url";
-import db from "./db/database.js";
 import errorHandler from "./middleware/errorHandler.js";
 import notFound from "./middleware/notFound.js";
 import company from "./routes/company.js";
