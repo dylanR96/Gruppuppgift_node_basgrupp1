@@ -152,7 +152,7 @@ const getOrder = async (req, res) => {
   }
 };
 
-// Add products to the order
+// Add products to order
 const changeOrder = async (req, res) => {
   //Checks if data is an array or just an object
   // const newOrder = Array.isArray(req.body) ? req.body : [req.body];
