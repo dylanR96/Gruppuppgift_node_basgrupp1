@@ -113,32 +113,53 @@ const getOrder = async (req, res) => {
 
 // För att lägga till en produkt i ordern
 const changeOrder = async (req, res) => {
-  // För felhantering
-  // console.log(`id: ${id}, title: ${title}, desc: ${desc}, price: ${price}`);
+  const { orderId } = req.params;
+  const updatedItems = Array.isArray(req.body) ? req.body : [req.body];
 
-  // För att hämta data ifrån bodyn.
-  const { id, title, desc, price } = req.body;
-
-  // Skapa en loop som loopar igenom varje "order"/"produkt" i bodyn
-  for (let order of req.body) {
-    // Om någon av dessa saknas i bodyn så returneras ett felmeddelande.
+  for (let order of updatedItems) {
     const { id, title, desc, price } = order;
+    if (!id || !title || !desc || !price) {
+      return res.status(400).json({
+        error: "Each order must contain a Id, title, desc and price",
+      });
+    }
+    let itemFound = false;
 
-    if (id == null || title == null || desc == null || price == null) {
-      return res
-        .status(400)
-        .json({ error: "Each order must contain id, title, desc, and price" });
+    for (let item of menu) {
+      if (
+        item._id === id &&
+        item.title === title &&
+        item.desc === desc &&
+        item.price === price
+      ) {
+        itemFound = true;
+        break;
+      }
+    }
+
+    if (!itemFound) {
+      return res.status(400).json({
+        error: "Items must match menu",
+      });
     }
   }
 
-  // Om allt finns i bodyn så körs koden nedanför.
   try {
-    // Hämtar data ifrån databasen och lägger in i variabeln updateData.
-    const updateData = await db.order.insert(req.body);
+    const existingOrder = await db["order"].findOne({ orderId });
+    if (!existingOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    existingOrder.newOrder = [existingOrder.newOrder, ...updatedItems];
 
-    // Returnerar en status 200 och skickar med updateData.
-    return res.status(200).json(updateData);
+    await db["order"].update(
+      { orderId },
+      { $set: { newOrder: existingOrder.newOrder } }
+    );
+    return res
+      .status(200)
+      .json({ message: "Order has been updated successfully", orderId });
   } catch (error) {
+    console.error("Error updating order");
     return res.status(500).send({ error: "Error updating order" });
   }
 };

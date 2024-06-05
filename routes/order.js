@@ -14,7 +14,7 @@ const router = Router();
 router.get("/getOrder/:orderId", getOrder);
 
 // Ändra varukorg
-router.put("/changeOrder", changeOrder);
+router.put("/changeOrder/:orderId", changeOrder);
 
 // Skapa order
 router.post("/createOrder", createOrder);
