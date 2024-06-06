@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { getMenu, getCompanyInfo } from "../controllers/companyController.js";
 
 const router = Router();
 
