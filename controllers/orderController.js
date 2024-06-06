@@ -105,7 +105,7 @@ const createOrder = async (req, res) => {
     // Adds estimated delivery to object
     const userId = req.query.userId;
     if (!userId) {
-      res.json(`Order created as a guest.`);
+      console.log(`Order created as a guest.`);
     } else {
       // Checks if user ID exists in database
       const userExists = await db["users"].findOne({ _id: userId });
@@ -189,7 +189,7 @@ const changeOrder = async (req, res) => {
     if (!existingOrder) {
       return res.status(404).json({ message: "Order not found" });
     }
-    existingOrder.newOrder = [existingOrder.newOrder, ...updatedItems];
+    existingOrder.newOrder = [existingOrder.newOrder, updatedItems];
 
     await db["order"].update(
       { orderId },
