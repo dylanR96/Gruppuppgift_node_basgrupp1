@@ -21,7 +21,6 @@ app.use("/api/users", users);
 
 // Middlewares
 app.use(notFound);
-
 app.use(errorHandler);
 
 app.listen(port, () => console.log(`Server is running on PORT: ${port}`));
