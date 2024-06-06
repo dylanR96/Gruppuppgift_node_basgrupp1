@@ -7,7 +7,7 @@ const authenticate = (req, res, next) => {
   } else {
     res.status(401).json({
       success: false,
-      message: "Unauthorized",
+      message: "Unauthorized request, please login.",
       status: 401,
     });
   }

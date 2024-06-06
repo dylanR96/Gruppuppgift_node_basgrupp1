@@ -103,10 +103,9 @@ const createOrder = async (req, res) => {
 
   try {
     // Adds estimated delivery to object
-    console.log("Request query:", req.query);
     const userId = req.query.userId;
     if (!userId) {
-      console.log("User ID not provided.");
+      res.json(`Order created as a guest.`);
     } else {
       // Checks if user ID exists in database
       const userExists = await db["users"].findOne({ _id: userId });
