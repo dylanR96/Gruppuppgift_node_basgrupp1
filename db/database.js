@@ -18,4 +18,5 @@ database_names.forEach((name) => {
     autoload: true,
   });
 });
+
 export default db;
