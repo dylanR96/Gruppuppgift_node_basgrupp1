@@ -1,22 +1,22 @@
 import { Router } from "express";
 import {
   createOrder,
-  getOrderStatus,
-  changeOrder,
+  orderConfirmation,
+  addItemCart,
   deleteItem,
-  completeOrder,
+  sendOrder,
   orderHistory,
-  getOrder,
+  getCart,
 } from "../controllers/orderController.js";
 import authenticate from "../middleware/auth.js";
 
 const router = Router();
 
 // Get cart
-router.get("/getOrder/:orderId", getOrder);
+router.get("/getCart/:orderId", getCart);
 
-// Change order
-router.put("/changeOrder/:orderId", changeOrder);
+// Adds item to cart
+router.put("/addItemCart/:orderId", addItemCart);
 
 // Create order
 router.post("/createOrder", createOrder);
@@ -24,11 +24,11 @@ router.post("/createOrder", createOrder);
 // Remove item from cart
 router.delete("/deleteItem/:orderId", deleteItem);
 
-// Orderstatus
-router.get("/orderStatus/:orderId", getOrderStatus);
+// Get order confirmation
+router.get("/orderConfirmation/:orderId", orderConfirmation);
 
 // Complete order
-router.post("/completeOrder/:orderId", completeOrder);
+router.post("/sendOrder/:orderId", sendOrder);
 
 // Order history and authentication
 router.get("/orderHistory/:userId", authenticate, orderHistory);

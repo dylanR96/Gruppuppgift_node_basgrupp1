@@ -132,7 +132,7 @@ const createOrder = async (req, res) => {
 };
 
 // Retrieve an order by its ID
-const getOrder = async (req, res) => {
+const getCart = async (req, res) => {
   try {
     const { orderId } = req.params;
 
@@ -152,7 +152,7 @@ const getOrder = async (req, res) => {
 };
 
 // To add a product to the order
-const changeOrder = async (req, res) => {
+const addItemCart = async (req, res) => {
   const { orderId } = req.params;
   const updatedItems = Array.isArray(req.body) ? req.body : [req.body];
 
@@ -203,12 +203,12 @@ const changeOrder = async (req, res) => {
   }
 };
 
-const getOrderStatus = async (req, res) => {
+const orderConfirmation = async (req, res) => {
   // Receives order ID as parameter from user
   const { orderId } = req.params;
   // Looks for order ID in database
   try {
-    const orderData = await db["completeOrder"].findOne({ orderId: orderId });
+    const orderData = await db["completedOrder"].findOne({ orderId: orderId });
     // Error handling for order id
     if (!orderData) {
       return res.status(404).send({ error: "Order not found." });
@@ -223,7 +223,7 @@ const getOrderStatus = async (req, res) => {
 };
 
 // Marks an order as complete by moving it from the order-database to complete-database
-const completeOrder = async (req, res) => {
+const sendOrder = async (req, res) => {
   const { orderId } = req.params;
 
   try {
@@ -231,7 +231,7 @@ const completeOrder = async (req, res) => {
     if (!orderData) {
       return res.status(404).send({ error: "Order not found." });
     }
-    const updateData = await db.completeOrder.insert(orderData);
+    const updateData = await db.completedOrder.insert(orderData);
     const deletedData = await db.order.remove(orderData, { multi: true });
     return res.status(200).json({
       message: `Your order is complete. Order id: ${orderId}.`,
@@ -246,7 +246,7 @@ const orderHistory = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const userOrders = await db.completeOrder.find({ userId: userId });
+    const userOrders = await db.completedOrder.find({ userId: userId });
     if (userOrders.length === 0) {
       return res
         .status(404)
@@ -262,10 +262,10 @@ const orderHistory = async (req, res) => {
 
 export {
   createOrder,
-  getOrderStatus,
-  changeOrder,
+  orderConfirmation,
+  addItemCart,
   deleteItem,
-  completeOrder,
+  sendOrder,
   orderHistory,
-  getOrder,
+  getCart,
 };
