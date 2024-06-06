@@ -5,7 +5,7 @@ import company from "./routes/company.js";
 import order from "./routes/order.js";
 import users from "./routes/users.js";
 
-const port = process.env.PORT || 8000;
+const port = 8000;
 const app = express();
 
 global.currentUser = null;
