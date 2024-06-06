@@ -1,32 +1,36 @@
 import { Router } from "express";
+import {
+  createOrder,
+  orderConfirmation,
+  addItemCart,
+  deleteItem,
+  sendOrder,
+  orderHistory,
+  getCart,
+} from "../controllers/orderController.js";
+import authenticate from "../middleware/auth.js";
 
 const router = Router();
 
-// Hämta varukorg
-router.get("/getOrder", (req, res) => {
-  res.send("<h1>Visa varukorg</h1>");
-});
+// Get cart
+router.get("/getCart/:orderId", getCart);
 
-// Ändra varukorg
-router.put("/changeOrder", (req, res) => {
-  res.sendStatus(200);
-});
+// Adds item to cart
+router.put("/addItemCart/:orderId", addItemCart);
 
-// Skapa order
-router.post("/createOrder", (req, res) => {
-  res.sendStatus(201);
-});
+// Create order
+router.post("/createOrder", createOrder);
 
-// Ta bort order från varukorg
-router.delete("/deleteItem", (req, res) => {
-  res
-    .status(200)
-    .json({ message: "Produkten har tagits bort från kundvagnen" });
-});
+// Remove item from cart
+router.delete("/deleteItem/:orderId", deleteItem);
 
-// Orderstatus
-router.post("/createOrder/orderStatus", (req, res) => {
-  res.sendStatus(200);
-});
+// Get order confirmation
+router.get("/orderConfirmation/:orderId", orderConfirmation);
+
+// Complete order
+router.post("/sendOrder/:orderId", sendOrder);
+
+// Order history and authentication
+router.get("/orderHistory/:userId", authenticate, orderHistory);
 
 export default router;

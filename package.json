@@ -5,12 +5,14 @@
   "description": "Dylan, Eric, Jonathan, Marina, Shahin, Sofia",
   "main": "server.js",
   "scripts": {
-    "server": "nodemon --env-file=.env server",
-    "dev": "npm run server"
+    "server": "nodemon server",
+    "dev": "npm run server",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "joi": "^17.13.1",

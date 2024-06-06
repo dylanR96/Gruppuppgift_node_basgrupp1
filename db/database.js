@@ -2,13 +2,17 @@ import nedb from "nedb-promises";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Path to databases
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
-const database_names = ["company", "order", "users"];
+// Names of databases
+const database_names = ["company", "order", "users", "completedOrder"];
 const db = {};
+
+// Create databases
 database_names.forEach((name) => {
-  const database_directory = `${__dirname}\\${name}.db`;
+  const database_directory = path.join(dirname, `${name}.db`);
   db[name] = new nedb({
     filename: database_directory,
     autoload: true,

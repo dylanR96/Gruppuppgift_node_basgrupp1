@@ -1,14 +1,11 @@
 import { Router } from "express";
-// import getMenu from "../controllers/companyController.js";
 
 const router = Router();
 
-// Hämta menyn
-// router.get("/menu", getMenu);
+// Get menu
+router.get("/menu", getMenu);
 
-// Hämta information om företaget
-router.get("/companyInfo", (req, res) => {
-  res.send("<h1>Om AirBean</h1>");
-});
+// Get information about the company
+router.get("/companyInfo", getCompanyInfo);
 
 export default router;
