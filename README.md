@@ -37,7 +37,7 @@ Method: GET
 http://localhost:8000/api/order/createOrder  
 Method: POST
 
-Add query params Key: userID and the Value: {userId} when creating the order as a registered user.
+Add query params Key: userId and the Value: {userId} when creating the order as a registered user.
 
 Go to the "Body" tab (in Postman or Insomnia).
 Select "JSON" as the format.
@@ -63,34 +63,34 @@ Example of JSON structure for creating several orders:
 
 Will give the user the response: "Your order id: 000."
 
-###  Send order:
-http://localhost:8000/api/order/sendOrder/:orderID
+###  Send order:  
+http://localhost:8000/api/order/sendOrder/:orderId  
 Method: POST  
 
 To complete your order use sendOrder with your order id. Order will be sent to completedOrder.db. You can then see order history and order status.
 
 ###  Get cart:
-http://localhost:8000/api/order/getCart/:orderId
+http://localhost:8000/api/order/getCart/:orderId  
 Method: GET  
 
-When you create an order in CreateOrder you’ll receive an orderId. Copy that orderId and paste it at the end of the URL. For example, if you receive a response of orderID 349 then paste it like this. http://localhost:8000/api/order/getCart/349
+When you create an order in CreateOrder you’ll receive an orderId. Copy that orderId and paste it at the end of the URL. For example, if you receive a response of orderId 349 then paste it like this. http://localhost:8000/api/order/getCart/349
 
 ###  Add item cart:
 http://localhost:8000/api/order/addItemCart/:orderId  
 Method: PUT  
 
 If you want to add something in your cart then you can use this method.
-Almost like you did in getCart you’ll have to paste your orderID at the end of the URL.
+Almost like you did in getCart you’ll have to paste your orderId at the end of the URL.
 In the body tab in insomnia/postman. Take note that it’s very important that you choose something from the menu.js file otherwise you’ll receive: error: "Items must match menu". Go to: Vs Code >> services >> menu.js to see the menu list or make a get request: http://localhost:8000/api/company/menu
 
 ###  Delete item:
-http://localhost:8000/api/order/deleteItem/:orderID?itemId=<ProductID>  
+http://localhost:8000/api/order/deleteItem/:orderId?itemId=<ProductID>  
 Method: DELETE  
 
 Go to the "Parameters" tab (in Postman or Insomnia).
-Add query params key: itemID and the value: {itemId} when deleting an item from the order.
+Add query params key: itemId and the value: {itemId} when deleting an item from the order.
 Order confirmation:
-http://localhost:8000/api/order/orderConfirmation/:orderID
+http://localhost:8000/api/order/orderConfirmation/:orderId
 Method: GET
 \*Must be done after calling sendOrder.
 
@@ -152,7 +152,7 @@ http://localhost:8000/api/users/logout
 Method: POST  
 
 ###  Order history for registered users:
-http://localhost:8000/api/order/orderHistory/:userID  
+http://localhost:8000/api/order/orderHistory/:userId  
 Method: GET
 
 Will give the user this response:
